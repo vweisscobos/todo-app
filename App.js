@@ -11,6 +11,11 @@ import { navigationRef } from './src/components/RootNavigation';
 import AuthScreen from './src/components/AuthScreen';
 import * as api from './api';
 
+
+import { Provider } from 'react-redux';
+import { store } from './src/store';
+
+
 const Drawer = createDrawerNavigator();
 
 export default class App extends React.Component {
@@ -38,18 +43,20 @@ export default class App extends React.Component {
 
     if (!loggedIn) {
       return <AuthScreen onCheckAuthorization={this.checkAuthorization}/>
-    }
+    }    
 
     return (
-      <NavigationContainer ref={navigationRef}>
-        <Header />
-        <Drawer.Navigator initialRouteName="Home">
-          <Drawer.Screen name="Home" component={HomeScreen} />
-          <Drawer.Screen name="Perfil">
-            {props => <ProfileScreen {...props} user={loggedIn}/>}
-          </Drawer.Screen>
-        </Drawer.Navigator>
-      </NavigationContainer>
+      <Provider store={store}>
+        <NavigationContainer ref={navigationRef}>
+          <Header />
+          <Drawer.Navigator initialRouteName="Home">
+            <Drawer.Screen name="Home" component={HomeScreen} />
+            <Drawer.Screen name="Perfil">
+              {props => <ProfileScreen {...props} user={loggedIn}/>}
+            </Drawer.Screen>
+          </Drawer.Navigator>
+        </NavigationContainer>
+      </Provider>
     );
   }
 }

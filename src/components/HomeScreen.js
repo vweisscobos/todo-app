@@ -4,12 +4,13 @@ import * as api from '../../api';
 import TodoCard from './TodoCard';
 import CreateItemButton from './CreateItemButton';
 import CreateItemModal from './CreateItemModal';
+import { connect } from 'react-redux';
+import { addTodo, fetchTodoListSuccess } from '../actions/todo';
 
 class HomeScreen extends React.Component {
   constructor() {
     super();
     this.state = {
-      todoList: [],
       isCreatingItem: false, 
     }
   }
@@ -17,12 +18,12 @@ class HomeScreen extends React.Component {
   componentDidMount = () => {
     api.fetchTodoList()
       .then(res => {
-        this.setState({ todoList: res });
+        this.props.fetchTodoListSuccess(res);
       })
       .catch(err => {
         alert(err);
       })
-  }
+  } 
 
   onCreateItemPress = () => {
     this.setState({ isCreatingItem: true });
@@ -33,23 +34,23 @@ class HomeScreen extends React.Component {
   }
 
   onItemCreated = (item) => {
-    this.setState(prevState => {
-      return { todoList: [...prevState.todoList, item] }
-    });
+    this.props.addTodo(item);
     this.setState({ isCreatingItem: false });
   }
   
   render() {
     const {
-      todoList,
       isCreatingItem,
     } = this.state;
+    const {
+      todoList,
+    } = this.props;
 
     return (
       <View style={{ flex: 1 }}>
         <View style={{ padding: 20 }}>
           {
-            todoList.map(item => <TodoCard description={item.description}/>)
+            todoList.map((item, index) => <TodoCard description={item.description}/>)
           }
         </View>
         <View style={{
@@ -70,4 +71,15 @@ class HomeScreen extends React.Component {
   }
 }
 
-export default HomeScreen;
+const mapStateToProps = (store) => {
+  return {
+    todoList: store,
+  };
+};
+
+const mapDispatchToProps = {
+  addTodo,
+  fetchTodoListSuccess
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen);
